@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubus Hijau Wireframe - Single File</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Mencegah scrollbar */
+            /* Latar belakang body bisa diatur di sini, tapi scene akan punya latar sendiri */
+            background-color: #333; /* Warna fallback jika canvas tidak penuh */
+        }
+        canvas {
+            display: block; /* Menghilangkan spasi ekstra di bawah canvas */
+        }
+    </style>
+    <!-- Muat Three.js (versi non-module) sebelum script utama -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Catatan: Anda bisa menggunakan versi Three.js yang lebih baru jika diinginkan,
+         misalnya: https://unpkg.com/three@0.160.0/build/three.min.js
+         Pastikan kompatibilitas jika Anda mengubah versi secara signifikan.
+         Saya menggunakan r128 karena itu umum dan stabil untuk contoh dasar.
+         Untuk fitur terbaru, 0.15x atau 0.16x lebih baik. Mari kita gunakan yang lebih baru. -->
+    <!-- <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script> -->
+    <!-- Untuk konsistensi dengan contoh awal Anda, mari gunakan versi yang lebih dekat -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+
+</head>
+<body>
+    <!-- Container tidak diperlukan jika renderer.domElement langsung ditambahkan ke body -->
+
+    <script>
+        // Variabel global untuk Three.js
+        let scene, camera, renderer, cube;
+        let animationId;
+
+        // --- Fungsi Inisialisasi Utama ---
+        function init() {
+            console.log("Init started. Three.js version:", THREE.REVISION);
+
+            // 1. Buat Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a1a); // Latar belakang scene gelap seperti gambar
+
+            // 2. Buat Kamera
+            const fov = 75;
+            const aspect = window.innerWidth / window.innerHeight;
+            const near = 0.1;
+            const far = 1000;
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            camera.position.z = 3; // Posisikan kamera
+
+            // 3. Buat Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio); // Untuk tampilan lebih tajam
+            document.body.appendChild(renderer.domElement); // Tambahkan canvas ke body
+
+            // 4. Buat Kubus Hijau Wireframe
+            const geometry = new THREE.BoxGeometry(1, 1, 1); // Ukuran kubus
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x00ff00, // Warna hijau
+                wireframe: true   // Membuatnya menjadi wireframe
+            });
+            cube = new THREE.Mesh(geometry, material);
+            scene.add(cube); // Tambahkan kubus ke scene
+
+            // 5. Mulai Loop Animasi
+            animate();
+
+            // 6. Handle window resize
+            window.addEventListener('resize', onWindowResize, false);
+
+            console.log("Init finished. Cube should be visible and rotating.");
+        }
+
+        // --- Fungsi Loop Animasi ---
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+
+            // Rotasi kubus
+            if (cube) {
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                // cube.rotation.z bisa ditambahkan jika ingin rotasi pada sumbu Z
+            }
+
+            // Render scene
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
+        }
+
+        // --- Fungsi Handler untuk Window Resize ---
+        function onWindowResize() {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+
+        // Panggil fungsi init setelah DOM siap, atau langsung jika sudah siap
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+    </script>
+</body>
+</html>
